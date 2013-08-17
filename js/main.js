@@ -1,38 +1,24 @@
-// AVFW
+// ASDI
 // Term 1308
 // Banchop Ben Kangdouangnhot
 
-$(function() {
-	$('#clickme').click(function() {
-				
-		$.ajax({
-			url: 'json.json',
-			dataType: 'json',
-			success: function(data){
 
-			var items = [];
-		
-			$.each(data, function(key, val) {
-		
-			items.push('<li id="' + key + '">' + val + '</li>');
-			
-			 });
-	 
-			 $('<ul/>', {
-			 	'class': 'interest-list',
-			 	html: items.join('') 	
-			}).appendTo('body');
-				
-			},
-			statusCode: {
-				404: function(){
-				alert('There was problem with the server, please try again later');
-				}
-			}
-		});
-		
-	});
+// Calling JSON
+$(document).ready(function(){
 
+  $("#clickme").click(function(){
+    $.getJSON("json.json",function(result){
+      $.each(result, function(i, field){
+     
+     
+     $("#jason").append('<li id= " " >' + i + ":" + " " + field +  '</li>' );   //Working 
+   //   $("#jason").append('<li id= " " >' + i + ":" + " " + field +  '</li>' );   //Working
+   	  // $("#jason").append('<li id="' + i + '" >' + field +  '</li>');   //string only
+      //	$("#jason").append('<li id="' + field + '" >' + i + "" + '</li>');  //id only
+      //  $("#jason").append(field + " ");  //does one at a time
+      });
+    });
+  });
 });
 
 
@@ -40,7 +26,6 @@ $('#button').click(function() {
 	var name = $('#name').val();
 	var string = $('#string').val();
 	alert(string);
-
 	//$.post('php/reverse.php', { input: string }, function(data) {
 	$.post('php/reverse.php', { string: string, name: name }, function(data) {
 		$('#feedback').html(data);
@@ -71,7 +56,7 @@ $('#buttons').click(function() {
 
 });
 
-
+// AJAX and PHP
 $('#buttons').click(function() {
 	var names = $('#names').val();
 	
@@ -90,7 +75,7 @@ $('#buttons').click(function() {
 });
 
 
-
+// xmlHttp request
 var xmlHttp= createXmlHttpRequestObject();
  
 function createXmlHttpRequestObject(){
@@ -125,8 +110,7 @@ function process(){
          setTimeout('process()', 1000);
          }
    }
-   
-   
+      
 function handleServerResponse(){
    if(xmlHttp.readyState==4){
             if(xmlHttp.status==200){
@@ -143,244 +127,202 @@ function handleServerResponse(){
 
 
 
+// JQM form validation
+$('#homes').on('pageinit', function(){
 
-
-
-
-
- 
-//VFW codes
-window.addEventListener( "DOMContentLoaded", function() {
-
-// getElementById function
-function main ( clear ) {
-	var teams = document.getElementById( clear );
-	return teams;
-}
-  
-function toggle( togg ) {
-	 switch(togg) {
-	 	case "on" :
-	 		main("saveValues").style.display = "none";
-	 		main("form").style.display = "none";
-	 		main('Info').style.display ="none";
-	 		main('clearData').style.display ="none";
-	 		main('back').style.display = "block";	
-
-	 	break;
-
-	 	case "off" :
-	 		main("form").style.display = "block";
-	 		main('Info').style.display ="none";
-	 		main('clearData').style.display ="none";
-	 		main('saveValues').style.display = "block";
-	 		main('items').style.display="none";
-	 		
-	 	break;
-	 		default:
-	 			return false;
-	 }
-
-}
-
-// get random number
-function storeLocalData( key ) {  // passing in "edit" item from tutorial 3.6
-	// if there is no key, this means this is a brand new item and need a new key.
-	if(!key){
-		var getId = Math.floor(Math.random()*100000001);
-	}else{
-
-	getId = key;
-			
-}
-
-	var it 	= {};
-		it.sport	= ["Sports ",			 main("sport").value];
-		it.tname	= ["Team Name ",		 main("tname").value];
-
-    
-	// save data to local storage! use Stringify to convert our object to a string
-	localStorage.setItem( getId, JSON.stringify(it) );
-	alert("Data has been saved!");
-}
-
-// write data from local storage to browser
-function getData () {
+	var rbform = $('#recordform');	// calling form
+    var FEerror = $('#formerrorlink'); // calling error dialog 
 	
-	toggle("on");
+	rbform.validate({
+		invalidHandler: function(form, validator){
+			FEerror.click(); // taget error anchor tag
+			//console.log(validator.submitted);
+			
+			var html = "";
+			
+			
+			for(var key in validator.submitted){  //Looping through keys
+				var label = $('label[for^="'+ key +'"]'); // finding label thats start with 'for'
+				//console.log(label.text());
+				var legend = label.closest('fieldset').find('.ui-controlgroup-label').not(); // getting radios
+				var fieldName = legend.length ? legend.text() :label.text();
+				//console.log(fieldName);
+				
+				
+				html += '<li>' + fieldName + '</li>'; //Strings added to dialog by targeting
+			};
+			$('#formErrors ul').html(html);
 		
-	if( localStorage.length === 0 ) {
-		alert("Nothing to show")
+		},
 		
-		} 
+		    submitHandler: function(){
+			var data = rbform.serializeArray();
+			
+			getData();
+			console.log(data);
+			
+		}
 		
-		var make = document.createElement("div");
-		make.setAttribute("id", "items");
-		var makeList = document.createElement('ul');
-		make.appendChild(makeList);		
-		document.body.appendChild(make);
-		main('items').style.display="block";	
+	});
+		
 
-		// looking in local storage
-		for(var i=0, j=localStorage.length; i<j; i++) {
-		var makeli = document.createElement("ul");
-			
-		var linksLi = document.createElement("ul");  //creating another list item for week 3
-			
-		makeList.appendChild(makeli);
+
+});
+  
+
+	//Get XML
+	$("#xml").on("click", function(){
+		$("#exlist").empty();
+		$('<h1> XML Listing </h1>').appendTo("#exlist");
+		$.ajax({
+			url: "ticket_catalog.xml",
+			type: "GET",
+			dataType: "xml",
+			success: function(data){
+				$(data).find("TK").each(function() {
+					$('<li class="ui-li ui-li-static ui-btn-up-c ui-first-child ui-last-child">' +
+					  '<h3 class="ui-li-heading">' + $(this).find('TEAMS').text() +'</h3>' +
+					  '<p class="ui-li-desc">' + 'Tickets found: Qty ' + $(this).find('TICKETS').text() + '</p>' +
+					    '</li>').appendTo("#xmllist");
+				});
+			},
+			error: function(error, perror){
+				console.log("Error:" + error + "\n" + "Parse Error: " + perror);
+			}
+		});
+	});
+
+
+// jQuery refactoring form
+$('#testform').on('pageinit', function() {
+
+// Storing DATA
+function storeData() {
+
+	var id 					= Math.floor(Math.random()* 100000001);
+
+	var item 				={};
+	
+		item.fullname  		=['Name:', $('#fullname').val()];
+		item.email			=['Email:', $('#email').val()];
+		item.concerns		=['Concerns:', $('#concerns').val()];
+		
+	localStorage.setItem(id, JSON.stringify(item));
+	alert('contact saved!');
+}
+
+// Getting DATA
+function getData() {
+
+	if(localStorage.length === 0) {
+		alert("Local Storage empty...");
+		//aFillData()
+		
+	}
+	var makeDiv = $('<div></div>');
+	
+	makeDiv.attr("id", "items");
+	makeDiv.attr("data-role","fieldcontain");
+	var makeList = $('<ul></ul>');
+	makeDiv.append(makeList);
+	$('#testform').append(makeDiv);
+	$('#clearLocal').css('display', 'inline');
+	for(var i=0, len=localStorage.length; i<len; i++) {
+		var makeLi = $('<li></li>');
+		var linksLi = $('<li></li>');
+		makeList.append(makeLi);
 		var key = localStorage.key(i);
 		var value = localStorage.getItem(key);
-		var object = JSON.parse(value); // convert local storage string back to object
-		var makeSubList = document.createElement("li");
-		makeli.appendChild(makeSubList);
-		for ( var m in object ) {
-			var makeSubLi = document.createElement("li");
-			makeSubList.appendChild(makeSubLi);
-			var optSub = object[m][0]+": "+object[m][1];
-			makeSubLi.innerHTML = optSub;
-			makeSubList.appendChild(linksLi); //append dynamically week 3
-
-			}
-		// Create our edit and delete button/link for each item in local storage week3	
-		 makeItemLinks(localStorage.key(i), linksLi); 
-	}// the makeItemLinks(localStorage.key[i],linksLi); threw me for a curve!!!! had [i], instead of (i)!!!
-	
-}
-	
-// make item links functions for local data
-// Create the edit and delete links for each stored data item when display.
-function makeItemLinks( key, linksLi ){
-//add edit single item link
-	var editLink = document.createElement('a');
-	editLink.href = "#";
-	editLink.key = key;   // this is the same thing, in editItem function
-	var editText = "Edit Here";
-	editLink.addEventListener("click", editItem);
-	editLink.innerHTML = editText;
-	linksLi.appendChild(editLink);
-
-	// add line break via JS
-	var breakTag = document.createElement("br");
-	linksLi.appendChild(breakTag);
-
-	var deleteLink = document.createElement("a");
-	deleteLink.href = "#";
-	deleteLink.key = key;
-	var deleteText = "Delete Info";
-	deleteLink.addEventListener("click", deleteItem);
-	deleteLink.innerHTML = deleteText;
-	linksLi.appendChild(deleteLink);
-
-}
-
-function deleteItem () {
-	var askConfirm = confirm("are you sure want to delete info?");
-	if(askConfirm){
-		localStorage.removeItem(this.key);
-		window.location.reload();
-	}else{
-		alert("Nothing has been change");
-	}
-}
-
-function editItem() {
-// get item from local storage.
-	var value = localStorage.getItem(this.key);
-	var it = JSON.parse(value);
-	
-	// show form
-	toggle("off");
-	
-	//populate the form fields with current local storage values.
-    main('sport').value = it.sport[1];
-	main('tname').value = it.tname[1];
-	
-	// Remove the initial listener from the input save button.
-	saveButton.removeEventListener("click", storeLocalData);
-	//change submit button value to edit button
-    main("saveValues").value = "Edit Info";
-	// key value used in this function as a property of the editSubmit even
-	var editSubmit = main("saveValues");  
-	editSubmit.addEventListener("click", validateForm);
-	editSubmit.key = this.key; // enabling submit key
-	
-}
-
-function clearLocalData () {
-	var youSure = confirm("You sure you want to delete?");
-		 if(youSure) {  
-		 	if( localStorage.length === 0){
-				alert("Local storage is empty")
-			}else{   
-				localStorage.clear();
-				alert("All data has been deleted!");
-				window.location.reload();
-				//return false;
-			}
-	} 
-
-}
-
-function validateForm( eventData ) {
-// Define the elements we want to check
-	
-	errorMsg.style.border = "";	
-	var getSport 	   = main("sport");
-	var getTname  	   = main("tname");	
-	var getName	       = main("name");
-	var getRange	   = main("range");
-			
-	// reset error messages from reprinting in form edit
-	errorMsg.innerHTML = " ";	
-	getSport.style.border = "1px solid black";
-	getTname.style.border = "1px solid black";
-	getName.style.border = "1px solid black";
-		
-	// Get error message
-	var messageArray = [ ];
-	// validation
-	if (getSport.value === ""){
-	var sportError = "Please choose a sport...";
-	errorMsg.style.color = "red";
-	errorMsg.style.fontSize = "14px";
-	getSport.style.border = "1px solid red";
-	messageArray.push(sportError);
-	}
-		
-	if (getTname.value === "") {
-		var tNameError = "Please enter a team name...";
-		errorMsg.style.color = "red";
-		getTname.style.border = "1px solid red";
-		messageArray.push(tNameError);
-	}
-
-	if(messageArray.length >= 1){
-		for(var i=0, j=messageArray.length; i<j; i++){
-			var text = document.createElement("div");
-			text.innerHTML = messageArray[i];
-			errorMsg.appendChild(text);
+		var obj = JSON.parse(value);
+		var makeSubList = $('<ul></ul>');
+		makeLi.append(makeSubList);
+		for(var n in obj) {
+			var makeSubLi = $('<li></li>');
+			makeSubList.append(makeSubLi);
+			var optSubText = obj[n][0]+ " "+obj[n][1];
+			makeSubLi.html(optSubText);
+			makeSubList.append(linksLi);
 		}
-		eventData.preventDefault();
-     	return false;
- 	}else{
- 	   // if good, data is finally save // this key was passed through "save" as a property
-	    storeLocalData(this.key);  //adding key to edit a certain file
-	
-  	}
-}  
+		makeItemLinks(localStorage.key(i),linksLi);
+	}
+}
 
 
-	var seasonValue,
-	errorMsg = main("errors");
-	
-	var displayData = main("Info");
-	displayData.addEventListener("click", getData );
+//Edit and delete
+function makeItemLinks(key, linksLi) {
+	var editLink = $('<a></a>');
+		editLink.attr("href", "#");
+	editLink.key = key;
+	var editText = "Edit Info";
+	$(editLink).click(function() {
+		editItem(key);
+		$('#displayData').css('display', 'none');
 
-	var clearLink = main("clearData");
-	clearLink.addEventListener("click", clearLocalData);
+	});
+	editLink.html(editText);
+	linksLi.append(editLink);
+
+	var breakTag = $('<br/>');
+	linksLi.append(breakTag);
+
+	var deleteLink = $('<a></a>');
+	deleteLink.attr("href", "#");
+	deleteLink.key = key;
+	var deleteText = "Delete Data";
+	$(deleteLink).click(function() {
+		deleteItem();
+	});
+	deleteLink.html(deleteText);
+	linksLi.append(deleteLink);
+}
+// Delete single item
+  function deleteItem() {
+	var ask = confirm("Delete Item?");
+	if(ask) {
+		//localStorage.removeItem(this.key);
+		localStorage.clear(this.key);
+		 window.location.reload();
+	} else{
+		alert("Nothing has been change!!!")
+
+	}
+}
+
+//Edit Item
+function editItem(key) {
+	var value = localStorage.getItem(key);
+	var item = JSON.parse(value);
 	
+	$('#fullname').val(item.fullname[1]);
+	$('#email').val(item.email[1]);
+	$('#concerns').val(item.concerns[1]);
+}
+
+// Clear Local Data
+function clearLocal() {
+	if(localStorage.length === 0) {
+		alert("Storage is Empty!");
+	} else {
+		localStorage.clear();
+		alert("Data Deleted");
+		window.location.reload();
+		return false;
+	}
+}
+
+	$('#displayData').on('click', function() {
+		getData();
 	
-	var saveButton = main("saveValues");
-	saveButton.addEventListener("click",  validateForm);
+	});
+	
+	$('#clearLocal').on('click', function() {
+		clearLocal();
+	});
+	
+	$('#submit').on('click', function() {
+		storeData();
+		window.location.reload();
+		
+	});
 
 });
